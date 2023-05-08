@@ -10,14 +10,14 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
 
-  @Bean
-  public WebClient factWebClient(
-    @Value("${fact_base_url}") String todoBaseUrl,
-    WebClient.Builder webClientBuilder) {
+    @Bean
+    public WebClient factWebClient(
+            @Value("${fact_base_url}") String todoBaseUrl,
+            WebClient.Builder webClientBuilder) {
 
-    return webClientBuilder
-      .baseUrl(todoBaseUrl)
-      .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-      .build();
-  }
+        return webClientBuilder
+                .baseUrl(todoBaseUrl)
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
 }

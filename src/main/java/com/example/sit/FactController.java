@@ -18,10 +18,10 @@ public class FactController {
   @GetMapping("/facts")
   public String getAllFacts() {
     return this.factWebclient
-      .get()
-      .uri("/facts")
-      .retrieve()
-      .bodyToMono(String.class)
-      .block();
+            .get()
+            .uri("/facts")
+            .retrieve()
+            .bodyToMono(String.class)
+            .block();
   }
 }

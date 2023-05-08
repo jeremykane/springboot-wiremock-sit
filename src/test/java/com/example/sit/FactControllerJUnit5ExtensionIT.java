@@ -20,60 +20,61 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class FactControllerJUnit5ExtensionIT {
 
-  @Autowired
-  private WebTestClient webTestClient;
+    @Autowired
+    private WebTestClient webTestClient;
 
-  @RegisterExtension
-  static WireMockExtension wireMockServer = WireMockExtension.newInstance()
-    .options(wireMockConfig().dynamicPort())
-    .build();
+    @RegisterExtension
+    static WireMockExtension wireMockServer = WireMockExtension.newInstance()
+            .options(wireMockConfig().dynamicPort())
+            .build();
 
-@DynamicPropertySource
-static void configureProperties(DynamicPropertyRegistry registry) {
-  registry.add("fact_base_url", wireMockServer::baseUrl);
-}
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("fact_base_url", wireMockServer::baseUrl);
+    }
 
-  @AfterEach
-  void resetAll() {
-    // we're using one WireMock server for the test class (see static on the WireMockExtension definition)
-    wireMockServer.resetAll();
-  }
+    @AfterEach
+    void resetAll() {
+        // we're using one WireMock server for the test class (see static on the WireMockExtension definition)
+        wireMockServer.resetAll();
+    }
 
-  @Test
-  void testGetAllFactsShouldReturnFacts() {
+    @Test
+    void testGetAllFactsShouldReturnFacts() {
 
-    wireMockServer.stubFor(
-      WireMock.get(WireMock.urlEqualTo("/facts"))
-        .willReturn(aResponse()
-          .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-          .withBodyFile("facts-api/response-200.json"))
-    );
+        wireMockServer.stubFor(
+                WireMock.get(WireMock.urlEqualTo("/facts"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                                .withBodyFile("facts-api/response-200.json"))
+        );
 
-    this.webTestClient
-      .get()
-      .uri("/api/facts")
-      .exchange()
-      .expectStatus()
-            .isOk()
-      .expectBody()
-            .jsonPath("$.data.length()").isEqualTo(10)
-            .jsonPath("$.total").isEqualTo(332)
-            .jsonPath("$.current_page").isEqualTo(1);
-  }
-  @Test
-  void testGetAllTodosShouldPropagateErrorMessageFromClient() {
-    wireMockServer.stubFor(
-      WireMock.get("/facts")
-        .willReturn(aResponse()
-          .withStatus(403)
-          .withFixedDelay(2000)) // milliseconds
-    );
+        this.webTestClient
+                .get()
+                .uri("/api/facts")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.data.length()").isEqualTo(10)
+                .jsonPath("$.total").isEqualTo(332)
+                .jsonPath("$.current_page").isEqualTo(1);
+    }
 
-    this.webTestClient
-      .get()
-      .uri("/api/facts")
-      .exchange()
-      .expectStatus()
-      .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR_500);
-  }
+    @Test
+    void testGetAllTodosShouldPropagateErrorMessageFromClient() {
+        wireMockServer.stubFor(
+                WireMock.get("/facts")
+                        .willReturn(aResponse()
+                                .withStatus(403)
+                                .withFixedDelay(2000)) // milliseconds
+        );
+
+        this.webTestClient
+                .get()
+                .uri("/api/facts")
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR_500);
+    }
 }
